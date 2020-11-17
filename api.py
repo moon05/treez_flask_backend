@@ -145,7 +145,7 @@ def get_specific_species(species_slug):
 	print (r)
 
 	random_fallback_choice = random.sample(FALLBACK_NAMES, 1)[0]
-	if r.status_code == 500 or r.status_code == 404 or r.status.code == 400:
+	if r.status_code == 500 or r.status_code == 404 or r.status_code == 400:
 		print ("got a 500 or 404 error code")
 		r = requests.get(base_url_species+random_fallback_choice, headers=HEADERS)
 
