@@ -45,15 +45,6 @@ def getCountrySpecificPlant():
 	return api.get_specific_species(recSlug)
 
 
-@app.route('/testAnotherButton')
-def testAnotherButton():
-	return api.get_specific_species("holcus-lanatus")
-
-@app.route('/getRandomPlantFromAnywhere')
-def getRandomPlantFromAnywhere():
-
-	return {"Random_Plant": 1}
-
 
 
 # Default port:
