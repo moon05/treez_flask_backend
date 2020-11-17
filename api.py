@@ -139,19 +139,23 @@ def get_slugs_in_list():
 
 
 
-
 def get_specific_species(species_slug):
 	print ("Slug delivered: " + species_slug)
 	r = requests.get(base_url_species+species_slug, headers=HEADERS)
 	print (r)
-	r= r.json()
+	r = r.json()
 	
 	fields = ["common_name", "slug", "scientific_name", "year", "author", "family_common_name", "vegetable",
 				"image_url", "duration", "edible_part", "edible", "images", "common_names", 
 				"distribution", "flower", "fruit_or_seed", "specifications", "growth"]
 	
 	res = g_format(r["data"], fields)
-	
+
+	if res["image_url"] is None:
+		r = requests.get(base_url_species+"juniperus-communis-var-communis", headers=HEADERS)
+		r = r.json()
+
+	res = g_format(r["data"], fields)
 	
 
 	if isinstance(res["common_names"], list):
