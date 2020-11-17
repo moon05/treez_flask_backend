@@ -99,7 +99,7 @@ def get_tree_slug_list(count):
 				"image_url", "duration", "edible_part", "edible", "images", "common_names", 
 				"distribution", "flower", "specifications", "growth"]
 	final_list = []
-	if (count is 1):
+	if (count == 1):
 		
 		INITIAL_PARAMS = {"filter_not[images]": "null"}
 		r = requests.get(base_url_species, params=INITIAL_PARAMS,headers=HEADERS).json()
@@ -203,4 +203,5 @@ def load_slugs():
 		k = pickle.load(fp)
 		print (type(k))
 	print (random.sample(k, 1))
+
 
