@@ -145,6 +145,8 @@ def get_specific_species(species_slug):
 	print (r)
 
 	random_fallback_choice = random.sample(FALLBACK_NAMES, 1)[0]
+
+	# Status Code Error
 	if r.status_code == 500 or r.status_code == 404 or r.status_code == 400:
 		print ("got a 500 or 404 error code")
 		r = requests.get(base_url_species+random_fallback_choice, headers=HEADERS)
@@ -157,16 +159,20 @@ def get_specific_species(species_slug):
 	
 	res = g_format(r["data"], fields)
 
+	# If No Image URL
 	if res["image_url"] is None:
 		print ("found image url null")
 		r = requests.get(base_url_species+random_fallback_choice, headers=HEADERS)
 		r = r.json()
 
+
+	# If either "EN" or "Eng" not in common_names
 	if isinstance(res["common_names"], dict):
-		if "en" or "eng" not in res["common_names"].keys():
-			print ("common_name empty, no english common_names")
-			r = requests.get(base_url_species+random_fallback_choice, headers=HEADERS)
-			r = r.json()
+		if "en" not in res["common_names"].keys():
+			if "eng" not in res["common_names"].keys():
+				print ("common_name empty, no english common_names")
+				r = requests.get(base_url_species+random_fallback_choice, headers=HEADERS)
+				r = r.json()
 
 
 	res = g_format(r["data"], fields)
@@ -210,10 +216,10 @@ def get_specific_species(species_slug):
 
 
 
-
 def load_slugs():
 	with open("./slugList.txt", "rb") as fp:
 		k = pickle.load(fp)
 		print (type(k))
 	print (random.sample(k, 1))
+
 
