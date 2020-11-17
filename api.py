@@ -137,12 +137,18 @@ def get_slugs_in_list():
 
 	return final_list
 
-
+FALLBACK_NAMES = ["juniperus-communis-var-communis", "scleranthus-annuus", "miconia-calvescens"]
 
 def get_specific_species(species_slug):
 	print ("Slug delivered: " + species_slug)
 	r = requests.get(base_url_species+species_slug, headers=HEADERS)
 	print (r)
+
+	random_fallback_choice = random.sample(FALLBACK_NAMES, 1)[0]
+	if r.status_code == 500 or r.status_code == 404 or r.status.code == 400:
+		print ("got a 500 or 404 error code")
+		r = requests.get(base_url_species+random_fallback_choice, headers=HEADERS)
+
 	r = r.json()
 	
 	fields = ["common_name", "slug", "scientific_name", "year", "author", "family_common_name", "vegetable",
@@ -152,18 +158,24 @@ def get_specific_species(species_slug):
 	res = g_format(r["data"], fields)
 
 	if res["image_url"] is None:
-		r = requests.get(base_url_species+"juniperus-communis-var-communis", headers=HEADERS)
+		print ("found image url null")
+		r = requests.get(base_url_species+random_fallback_choice, headers=HEADERS)
 		r = r.json()
+
+	if isinstance(res["common_names"], dict):
+		if "en" or "eng" not in res["common_names"].keys():
+			print ("common_name empty, no english common_names")
+			r = requests.get(base_url_species+random_fallback_choice, headers=HEADERS)
+			r = r.json()
+
 
 	res = g_format(r["data"], fields)
 	
 
 	if isinstance(res["common_names"], list):
-		print ("GOT a LIST in COMMON NAMES")
-		print (res["common_names"])
+		pass
 	
 	if isinstance(res["common_names"], dict):
-		
 		t = res["common_names"].keys()
 		if ("eng" in t):
 			res["common_names"] = res["common_names"]["eng"]
@@ -174,17 +186,14 @@ def get_specific_species(species_slug):
 	# if common_name field is empty get the first one from common_names and remove it
 	# or if common_name is there and the first of common_names is the same as common_name
 	# remove it
+
 	if res["common_name"] is None:
-		print ("got in none")
 		res["common_name"] = res["common_names"].pop(0)
 	elif res["common_name"].lower() == res["common_names"][0].lower():
-		print ("got in both first equal")
 		res["common_names"].pop(0)
 	
 	if isinstance(res["distribution"], list):
-		print (res["distribution"])
 		res["distribution"].sort()
-		print ("GOTCHA in DIST")
 
 	if isinstance(res["distribution"], dict):
 		if "native" in res["distribution"].keys():
@@ -207,5 +216,4 @@ def load_slugs():
 		k = pickle.load(fp)
 		print (type(k))
 	print (random.sample(k, 1))
-
 
